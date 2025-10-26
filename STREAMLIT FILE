@@ -1,0 +1,44 @@
+import streamlit as st
+import pandas as pd
+import pickle
+
+# Load the trained model
+pipe = pickle.load(open('linear_reg.pkl', 'rb'))
+
+st.title("🚗 Car Price Predictor")
+
+# Sidebar info
+st.sidebar.header("About")
+st.sidebar.info("This app predicts used car prices using a trained Machine Learning model built with scikit-learn.")
+
+# Input fields
+name = st.selectbox(
+    "Car Name",
+    ['Maruti Swift', 'Hyundai i20', 'Tata Nexon', 'Honda City', 'Mahindra XUV500']
+)
+
+company = st.selectbox(
+    "Company",
+    ['Maruti', 'Hyundai', 'Tata', 'Honda', 'Mahindra', 'Ford', 'Toyota']
+)
+
+year = st.number_input("Year of Purchase", min_value=1990, max_value=2025, value=2015)
+
+kms_driven = st.number_input("Kilometers Driven", min_value=0, value=50000)
+
+fuel_type = st.selectbox(
+    "Fuel Type",
+    ['Petrol', 'Diesel', 'LPG']
+)
+
+# Predict button
+if st.button("Predict Price"):
+    input_df = pd.DataFrame([[name, company, year, kms_driven, fuel_type]],
+                            columns=['name', 'company', 'year', 'kms_driven', 'fuel_type'])
+
+    # Show user input (for debugging)
+    st.write("Your Input Data:", input_df)
+
+    # Predict price
+    predicted_price = pipe.predict(input_df)[0]
+    st.success(f"💰 Predicted Car Price: ₹{int(predicted_price):,}")
